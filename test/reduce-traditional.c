@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <float.h>
+#include <math.h>
 
 
 /*
@@ -18,7 +19,7 @@ void reduce_data(int size){
   fread(data, size*sizeof(float), 1, file);
   fclose(file);
 
-  float mx = FLT_MIN;
+  float mx = -INFINITY;
   for(int i=0; i < size; i++){
     mx = data[i] > mx ? data[i]: mx;
   }

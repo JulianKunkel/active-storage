@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <float.h>
+#include <math.h>
 
 #include <ngi.h>
 
@@ -14,26 +15,54 @@
 
 // read the data and reduce it
 void reduce_data(int size){
-  float * data = malloc(size * sizeof(float));
   FILE * file = fopen("data.bin", "rb");
-  fread(data, size*sizeof(float), 1, file);
-  fclose(file);
-
-  server_reduce(file, 0, size*sizeof(float));
-
-  float mx = FLT_MIN;
-  for(int i=0; i < size; i++){
-    mx = data[i] > mx ? data[i]: mx;
-  }
-  free(data);
-
+  float mx;
+  server_reduce(file, NGI_OP_MAX, NGI_TYPE_FLOAT, & mx, 0, size*sizeof(float));
   printf("Maximum: %f\n", mx);
+  fclose(file);
 }
 
+void reduce_min_func(int8_t * data_i, void * out_buff, size_t off, size_t size){
+  float * outf = (float*) out_buff;
+  float mx = *outf;
+  float * data = (float*) data_i;
+  for(size_t i=0; i < size/sizeof(float); i++){
+    mx = data[i] > mx ? data[i]: mx;
+  }
+  *outf = mx;
+}
+
+void reduce_minmax_func(int8_t * data_i, void * out_buff, size_t off, size_t size){
+  float * outf = (float*) out_buff;
+  float mi = outf[0];
+  float mx = outf[1];
+  float * data = (float*) data_i;
+  for(size_t i=0; i < size/sizeof(float); i++){
+    mx = data[i] > mx ? data[i]: mx;
+    mi = data[i] < mi ? data[i]: mi;
+  }
+  outf[0] = mi;
+  outf[1] = mx;
+}
+
+// alternative using an external function
+void reduce_data_func(int size){
+  FILE * file = fopen("data.bin", "rb");
+  float mx;
+  mx = -INFINITY;
+  server_reduce_any_func(file, reduce_min_func, &mx, sizeof(float), 0, size*sizeof(float));
+  printf("Maximum: %f\n", mx);
+
+  float minmax[2] = {INFINITY, -INFINITY};
+  server_reduce_any_func(file, reduce_minmax_func, minmax, 2* sizeof(float), 0, size*sizeof(float));
+  printf("Min/Max: %f - %f\n", minmax[0], minmax[1]);
+  fclose(file);
+}
 
 
 int main(){
   int size = 100;
   reduce_data(size);
+  reduce_data_func(size);
   return 0;
 }
