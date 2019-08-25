@@ -36,7 +36,6 @@ int ngi_client_side_reduce(FILE * file, ngi_op_t op, ngi_type_t type, void * out
   assert(op == NGI_OP_MAX);
   int res = ngi_server_side_reduce(file, op, type, out_buff, off, size);
   assert(res == 0);
-  exit(0);
   return res;
 }
 
