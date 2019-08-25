@@ -31,7 +31,7 @@ void reduce_data(int size){
 
 
 int main(){
-  int size = 100;
+  int size = 40;
   reduce_data(size);
   return 0;
 }
