@@ -3,6 +3,12 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+//#include "ngi_log.h"
+
+/*
+ * Define the size in B of file extent exchanged between server and clint
+ */
+#define NGI_EXT_SZ 1048576
 
 typedef enum NGI_OP{
   NGI_OP_MAX
@@ -12,6 +18,12 @@ typedef enum NGI_TYPE{
   NGI_TYPE_FLOAT
 } ngi_type_t;
 
+/*
+ *
+ */
+int ngi_server_side_reduce(FILE * , ngi_op_t , ngi_type_t , void * , size_t , size_t );
+int ngi_client_side_reduce(FILE * , ngi_op_t , ngi_type_t , void * , size_t , size_t );
+int ngi_reduce_stub(FILE * , ngi_op_t , ngi_type_t , void * , size_t , size_t );
 /*
  * This function invoces a well known reduction operation on data of a well known type
  * Return 0 upon success, any other code, if e.g., short read
