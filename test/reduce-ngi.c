@@ -21,6 +21,14 @@ void reduce_data(int size){
   printf("Maximum: %f\n", mx);
   fclose(file);
 }
+// read the data and reduce it using the NGI emulation lib
+void reduce_data_native(int size){
+  FILE * file = fopen("data.bin", "rb");
+  float mx;
+  ngi_reduce_stub(file, NGI_OP_MAX, NGI_TYPE_FLOAT, & mx, 0, size*sizeof(float));
+  printf("Maximum (Ngi Native): %f\n", mx);
+  fclose(file);
+}
 
 void reduce_min_func(int8_t * data_i, void * out_buff, size_t off, size_t size){
   float * outf = (float*) out_buff;
@@ -61,8 +69,9 @@ void reduce_data_func(int size){
 
 
 int main(){
-  int size = 100;
+  int size = 40;
   reduce_data(size);
+  reduce_data_native(size);
   reduce_data_func(size);
   return 0;
 }
