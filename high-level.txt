@@ -1,0 +1,23 @@
+nc_open("file.nc", ...)
+
+nc_open_reduce("file.nc", "max()")
+
+
+normally:
+writer: produces some data (say 10 MB each)
+  -> write the data via ESDM
+read: I want this data => blocks until data is ready
+  -> ESDM + X "WP4/WP5 API" we will have the offloading, open (please apply this operator already)
+
+streaming:
+- open()
+- stream = apply_op("x")
+- stream.apply(offset =[0,0,0], size = [100,100,100])
+  - once data is ready, the stream operators they are applied in any order
+  - once completed, read completes
+- threading is already implemented in ESDM
+
+We should prototype some interfaces in a light-weight fashion.
+- WP5 => use-cases to be defined to motivate the work
+- Use-case for in-situ
+-
